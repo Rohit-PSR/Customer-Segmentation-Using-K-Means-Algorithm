@@ -1,0 +1,107 @@
+library(ggplot2)
+
+df <- read.csv("C:\\Users\\parip\\Downloads\\airplanecrash.csv")
+df
+
+operator_count <- df %>%
+  group_by(Operator) %>%
+  summarize(count = n()) %>%
+  drop_na()
+
+operator_count <- operator_count[order(operator_count$count, decreasing = TRUE), ]
+
+top_operators <- operator_count[1:20, ]
+
+ggplot(top_operators, aes(x = count, y = Operator)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  labs(x = "Crashes", y = "Top Operators") +
+  ggtitle("Top 20 Operators by Crashes") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.y = element_text(hjust = 0))
+
+
+
+op_fatalities <- df %>%
+  group_by(Operator) %>%
+  summarize(Fatalities = sum(Fatalities)) %>%
+  drop_na()
+
+op_fatalities <- op_fatalities[order(op_fatalities$Fatalities, decreasing = TRUE), ]
+
+
+top_operators_fatalities <- op_fatalities[1:20, ]
+
+ggplot(top_operators_fatalities, aes(x = Fatalities, y = Operator)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  labs(x = "Fatalities", y = "Top Operators") +
+  ggtitle("Top 20 Operators by Fatalities") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.y = element_text(hjust = 0))
+
+
+
+
+
+
+route_count <- df %>%
+  group_by(Route) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count))
+
+top_routes <- route_count[1:20, ]
+
+ggplot(top_routes, aes(x = count, y = Route)) +
+  geom_bar(stat = "identity", fill = "red") +
+  labs(x = "Crashes", y = "Top Routes") +
+  ggtitle("Top 20 Routes by Crashes") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.y = element_text(hjust = 0))
+
+
+
+route_fatalities <- df %>%
+  group_by(Route) %>%
+  summarize(Fatalities = sum(Fatalities)) %>%
+  arrange(desc(Fatalities)) %>%
+  head(20)
+
+ggplot(route_fatalities, aes(x = Fatalities, y = reorder(Route, -Fatalities))) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "Fatalities", y = "Route") +
+  
+  
+  ggtitle("Top 20 Routes by Fatalities") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.y = element_text(hjust = 0))
+
+
+
+
+
+
+
+df$Year <- as.numeric(substr(df$Date, start = 7, stop = 10))
+
+ggplot(df, aes(x = Year)) +
+  geom_histogram(binwidth = 1, fill = "green", color = "black") +
+  labs(x = "Year", y = "Count") +
+  ggtitle("Distribution of Years") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+
+
+df <- df %>% mutate(Year = as.numeric(substring(Date, 7)))
+df %>% 
+  group_by(Year) %>% 
+  summarise(Fatalities = sum(Fatalities), Aboard = sum(Aboard)) %>% 
+  ggplot(aes(x = Year)) + 
+  geom_bar(aes(y = Fatalities), stat = "identity", fill = "red", alpha = 0.5) + 
+  geom_bar(aes(y = Aboard), stat = "identity", fill = "blue", alpha = 0.5) + 
+  labs(title = "Fatalities and Aboard by Year", x = "Year", y = "Count") + 
+  theme_bw()
